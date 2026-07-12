@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Evolve AI — Personal Growth OS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0e140f;
+    --panel: #161f18;
+    --panel-2: #1c271e;
+    --line: #2a362c;
+    --text: #eaf2ec;
+    --muted: #8fa396;
+    --accent: #7cffb2;
+    --accent-dim: #3f6b53;
+    --amber: #ffb454;
+    --neg: #ff8a7a;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 15% 0%, rgba(124,255,178,0.06), transparent 40%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+  }
+  .mono{font-family:'JetBrains Mono', monospace;}
+  h1,h2,h3{font-family:'Fraunces', serif; margin:0;}
+
+  /* ---------- Gate screen ---------- */
+  #gate{
+    min-height:100vh;
+    display:flex; align-items:center; justify-content:center;
+    padding:24px;
+  }
+  .gate-card{
+    max-width:420px; width:100%;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:40px 32px;
+    text-align:center;
+  }
+  .gate-card .eyebrow{
+    color:var(--accent); font-family:'JetBrains Mono', monospace;
+    font-size:12px; letter-spacing:0.14em; text-transform:uppercase; margin-bottom:14px; display:block;
+  }
+  .gate-card h1{font-size:32px; font-weight:600; line-height:1.15; margin-bottom:10px;}
+  .gate-card p{color:var(--muted); font-size:14px; line-height:1.5; margin-bottom:26px;}
+  .gate-card input{
+    width:100%; padding:14px 16px; border-radius:10px;
+    border:1px solid var(--line); background:var(--panel-2); color:var(--text);
+    font-size:15px; font-family:'Inter', sans-serif; margin-bottom:14px;
+  }
+  .gate-card input:focus{outline:2px solid var(--accent); outline-offset:1px;}
+  .btn{
+    width:100%; padding:14px; border-radius:10px; border:none;
+    background:var(--accent); color:#0e140f; font-weight:600; font-size:15px;
+    cursor:pointer; font-family:'Inter', sans-serif;
+  }
+  .btn:hover{background:#9dffc4;}
+  .btn:focus-visible{outline:2px solid var(--text); outline-offset:2px;}
+
+  /* ---------- App shell ---------- */
+  #app{display:none; max-width:1080px; margin:0 auto; padding:32px 24px 80px;}
+  header.topbar{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    margin-bottom:28px; padding-bottom:20px; border-bottom:1px solid var(--line);
+  }
+  header.topbar .brand{display:flex; flex-direction:column; gap:4px;}
+  header.topbar .brand span.eyebrow{
+    font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.14em;
+    text-transform:uppercase; color:var(--accent);
+  }
+  header.topbar h1{font-size:26px;}
+  header.topbar .who{color:var(--muted); font-size:13px; font-family:'JetBrains Mono', monospace;}
+
+  .grid{display:grid; grid-template-columns: 1.3fr 1fr; gap:20px;}
+  @media (max-width:820px){ .grid{grid-template-columns:1fr;} }
+
+  .card{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:22px;
+  }
+  .card h2{font-size:16px; font-weight:600; margin-bottom:16px; display:flex; align-items:center; gap:8px;}
+  .card h2 .dot{width:6px; height:6px; border-radius:50%; background:var(--accent); display:inline-block;}
+
+  /* growth score gauge */
+  .score-row{display:flex; align-items:center; gap:22px; margin-bottom:6px;}
+  .gauge-wrap{position:relative; width:104px; height:104px; flex-shrink:0;}
+  .gauge-num{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    flex-direction:column;
+  }
+  .gauge-num .val{font-family:'Fraunces', serif; font-size:28px; font-weight:600;}
+  .gauge-num .lbl{font-size:9px; color:var(--muted); letter-spacing:0.08em; text-transform:uppercase; margin-top:-2px;}
+  .stat-list{display:flex; flex-direction:column; gap:10px; flex:1;}
+  .stat-line{display:flex; justify-content:space-between; font-size:13px;}
+  .stat-line .k{color:var(--muted);}
+  .stat-line .v{font-family:'JetBrains Mono', monospace;}
+  .advice{
+    margin-top:16px; padding:12px 14px; background:var(--panel-2); border-left:2px solid var(--accent);
+    border-radius:6px; font-size:13px; line-height:1.5; color:var(--text);
+  }
+  .advice .tag{color:var(--accent); font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; display:block; margin-bottom:6px;}
+
+  /* journal */
+  textarea{
+    width:100%; min-height:110px; resize:vertical; padding:14px; border-radius:10px;
+    border:1px solid var(--line); background:var(--panel-2); color:var(--text);
+    font-family:'Inter', sans-serif; font-size:14px; line-height:1.5;
+  }
+  textarea:focus{outline:2px solid var(--accent); outline-offset:1px;}
+  .journal-actions{display:flex; justify-content:space-between; align-items:center; margin-top:10px;}
+  .journal-actions button{
+    padding:9px 18px; border-radius:8px; border:none; background:var(--accent);
+    color:#0e140f; font-weight:600; font-size:13px; cursor:pointer;
+  }
+  .journal-actions .hint{font-size:11px; color:var(--muted);}
+  .entry-list{margin-top:18px; display:flex; flex-direction:column; gap:10px; max-height:260px; overflow-y:auto;}
+  .entry{
+    padding:11px 13px; border:1px solid var(--line); border-radius:8px; background:var(--panel-2);
+    font-size:13px; line-height:1.4;
+  }
+  .entry .meta{display:flex; justify-content:space-between; margin-bottom:5px;}
+  .entry .meta .date{color:var(--muted); font-family:'JetBrains Mono', monospace; font-size:11px;}
+  .mood-pill{
+    font-family:'JetBrains Mono', monospace; font-size:10px; padding:2px 8px; border-radius:20px;
+    text-transform:uppercase; letter-spacing:0.05em;
+  }
+  .mood-positive{background:rgba(124,255,178,0.15); color:var(--accent);}
+  .mood-neutral{background:rgba(143,163,150,0.15); color:var(--muted);}
+  .mood-negative{background:rgba(255,138,122,0.15); color:var(--neg);}
+
+  /* habits */
+  .habit-form{display:flex; gap:8px; margin-bottom:16px;}
+  .habit-form input{
+    flex:1; padding:11px 13px; border-radius:8px; border:1px solid var(--line);
+    background:var(--panel-2); color:var(--text); font-size:13px; font-family:'Inter', sans-serif;
+  }
+  .habit-form button{
+    padding:0 16px; border-radius:8px; border:none; background:var(--panel-2);
+    border:1px solid var(--accent); color:var(--accent); font-weight:600; cursor:pointer;
+  }
+  .habit-list{display:flex; flex-direction:column; gap:8px;}
+  .habit-row{
+    display:flex; align-items:center; gap:12px; padding:11px 13px;
+    border:1px solid var(--line); border-radius:8px; background:var(--panel-2);
+  }
+  .check{
+    width:20px; height:20px; border-radius:50%; border:2px solid var(--accent-dim);
+    display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0;
+    background:transparent; transition: background 0.15s, border-color 0.15s;
+  }
+  .check.done{background:var(--accent); border-color:var(--accent);}
+  .check.done::after{content:"✓"; color:#0e140f; font-size:12px; font-weight:700;}
+  .habit-name{flex:1; font-size:13px;}
+  .habit-streak{font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--amber); white-space:nowrap;}
+  .empty{color:var(--muted); font-size:13px; text-align:center; padding:20px 0;}
+
+  .insight-week{margin-top:20px;}
+  .insight-week .row{display:flex; justify-content:space-between; font-size:13px; padding:8px 0; border-bottom:1px dashed var(--line);}
+  .insight-week .row:last-child{border-bottom:none;}
+  .insight-week .k{color:var(--muted);}
+  .insight-week .v{font-family:'JetBrains Mono', monospace;}
+  .trend-up{color:var(--accent);}
+  .trend-down{color:var(--neg);}
+  .trend-flat{color:var(--muted);}
+
+  ::-webkit-scrollbar{width:8px;}
+  ::-webkit-scrollbar-thumb{background:var(--line); border-radius:4px;}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="gate-card">
+    <span class="eyebrow">Evolve AI</span>
+    <h1>Your personal growth OS</h1>
+    <p>One line to check in — a journal, a mood read, and your habits, tracked in one place. No password, just a name to save your progress under.</p>
+    <input id="usernameInput" type="text" placeholder="Pick a username" autocomplete="off" />
+    <button class="btn" onclick="enterApp()">Enter</button>
+  </div>
+</div>
+
+<div id="app">
+  <header class="topbar">
+    <div class="brand">
+      <span class="eyebrow">Evolve AI</span>
+      <h1>Dashboard</h1>
+    </div>
+    <div class="who mono" id="whoLabel"></div>
+  </header>
+
+  <div class="grid">
+    <!-- LEFT COLUMN -->
+    <div style="display:flex; flex-direction:column; gap:20px;">
+
+      <div class="card">
+        <h2><span class="dot"></span>Growth score</h2>
+        <div class="score-row">
+          <div class="gauge-wrap">
+            <svg viewBox="0 0 104 104" width="104" height="104">
+              <circle cx="52" cy="52" r="45" fill="none" stroke="#2a362c" stroke-width="9"/>
+              <circle id="gaugeArc" cx="52" cy="52" r="45" fill="none" stroke="#7cffb2" stroke-width="9"
+                stroke-linecap="round" stroke-dasharray="282.7" stroke-dashoffset="282.7"
+                transform="rotate(-90 52 52)"/>
+            </svg>
+            <div class="gauge-num">
+              <div class="val" id="growthScoreVal">–</div>
+              <div class="lbl">/ 100</div>
+            </div>
+          </div>
+          <div class="stat-list">
+            <div class="stat-line"><span class="k">Streak</span><span class="v" id="streakVal">–</span></div>
+            <div class="stat-line"><span class="k">Journal entries</span><span class="v" id="journalCountVal">–</span></div>
+            <div class="stat-line"><span class="k">Today's mood</span><span class="v" id="todayMoodVal">–</span></div>
+          </div>
+        </div>
+        <div class="advice">
+          <span class="tag">AI coach</span>
+          <span id="adviceText">Log something to get advice.</span>
+        </div>
+        <div class="advice" style="margin-top:10px; border-left-color:var(--amber);">
+          <span class="tag" style="color:var(--amber);">Affirmation</span>
+          <span id="affirmationText">Tap "New affirmation" for a line generated from your recent activity.</span>
+          <div style="margin-top:10px;">
+            <button onclick="getAffirmation()" style="padding:7px 14px; border-radius:7px; border:1px solid var(--amber); background:transparent; color:var(--amber); font-size:12px; font-weight:600; cursor:pointer;">New affirmation</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2><span class="dot"></span>Journal <span id="weatherChip" style="margin-left:auto; font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--muted); font-weight:400;"></span></h2>
+        <div style="position:relative;">
+          <textarea id="journalInput" placeholder="How's today going? Write a few sentences — Evolve reads the tone and tracks it over time."></textarea>
+          <button id="micBtn" onclick="toggleVoiceInput()" title="Speak your entry" style="position:absolute; bottom:10px; right:10px; width:34px; height:34px; border-radius:50%; border:1px solid var(--line); background:var(--panel); color:var(--muted); cursor:pointer; font-size:15px; display:flex; align-items:center; justify-content:center;">🎤</button>
+        </div>
+        <div class="journal-actions">
+          <span class="hint" id="journalHint">Mood is detected automatically from what you write.</span>
+          <button onclick="submitJournal()">Save entry</button>
+        </div>
+        <div class="entry-list" id="entryList"></div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div style="display:flex; flex-direction:column; gap:20px;">
+
+      <div class="card">
+        <h2><span class="dot"></span>Habits</h2>
+        <div class="habit-form">
+          <input id="habitInput" type="text" placeholder="Add a habit, e.g. Morning walk" />
+          <button onclick="submitHabit()">Add</button>
+        </div>
+        <div class="habit-list" id="habitList"></div>
+      </div>
+
+      <div class="card">
+        <h2><span class="dot"></span>This week</h2>
+        <div class="insight-week" id="weeklyInsight">
+          <div class="empty">Not enough data yet — check back after a few entries.</div>
+        </div>
+        <div style="display:flex; gap:8px; margin-top:16px;">
+          <a id="downloadCardBtn" href="#" target="_blank" style="flex:1; text-align:center; padding:10px; border-radius:8px; border:1px solid var(--line); color:var(--text); font-size:12px; text-decoration:none; font-weight:600;">📸 Share card</a>
+          <a id="downloadPdfBtn" href="#" style="flex:1; text-align:center; padding:10px; border-radius:8px; border:1px solid var(--line); color:var(--text); font-size:12px; text-decoration:none; font-weight:600;">📄 PDF report</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const API = ""; // same origin
+let username = null;
+let userCoords = null; // {lat, lon} once geolocation resolves, used for weather-aware advice
+
+function enterApp(){
+  const val = document.getElementById('usernameInput').value.trim();
+  if(!val){ return; }
+  username = val.toLowerCase();
+  localStorage.setItem('evolve_username', username);
+  document.getElementById('gate').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('whoLabel').textContent = '@' + username;
+  tryGetLocation();
+  refreshAll();
+}
+
+// ---------- voice journal (Web Speech API — browser-native, no server key needed) ----------
+let recognizer = null;
+let isListening = false;
+
+function toggleVoiceInput(){
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const micBtn = document.getElementById('micBtn');
+  const hint = document.getElementById('journalHint');
+
+  if(!SpeechRecognition){
+    hint.textContent = 'Voice input isn\'t supported in this browser — try Chrome or Edge.';
+    return;
+  }
+
+  if(isListening){
+    recognizer.stop();
+    return;
+  }
+
+  recognizer = new SpeechRecognition();
+  recognizer.lang = 'en-US';
+  recognizer.interimResults = true;
+  recognizer.continuous = true;
+
+  const textarea = document.getElementById('journalInput');
+  const baseText = textarea.value ? textarea.value.trim() + ' ' : '';
+
+  recognizer.onstart = () => {
+    isListening = true;
+    micBtn.style.background = 'var(--accent)';
+    micBtn.style.color = '#0e140f';
+    hint.textContent = 'Listening… tap the mic again to stop.';
+  };
+  recognizer.onresult = (event) => {
+    let transcript = '';
+    for(let i = 0; i < event.results.length; i++){
+      transcript += event.results[i][0].transcript;
+    }
+    textarea.value = baseText + transcript;
+  };
+  recognizer.onerror = () => {
+    hint.textContent = 'Voice input hit an error — you can keep typing instead.';
+  };
+  recognizer.onend = () => {
+    isListening = false;
+    micBtn.style.background = 'var(--panel)';
+    micBtn.style.color = 'var(--muted)';
+    hint.textContent = 'Mood is detected automatically from what you write.';
+  };
+  recognizer.start();
+}
+
+function tryGetLocation(){
+  if(!navigator.geolocation) return;
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      userCoords = {lat: pos.coords.latitude, lon: pos.coords.longitude};
+      loadWeatherChip();
+      loadWeekly(); // re-fetch so weekly advice can factor in weather
+    },
+    () => { /* permission denied or unavailable — app works fine without it */ },
+    {timeout: 5000}
+  );
+}
+
+async function loadWeatherChip(){
+  if(!userCoords) return;
+  try{
+    const w = await api(`/weather?lat=${userCoords.lat}&lon=${userCoords.lon}`);
+    const chip = document.getElementById('weatherChip');
+    if(w.available){
+      chip.textContent = `${Math.round(w.temp_c)}°C · ${w.condition}`;
+    }
+  }catch(e){ /* weather is enrichment only, fail silently */ }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('evolve_username');
+  if(saved){
+    document.getElementById('usernameInput').value = saved;
+    enterApp();
+  }
+  document.getElementById('usernameInput').addEventListener('keydown', e => {
+    if(e.key === 'Enter') enterApp();
+  });
+  document.getElementById('journalInput').addEventListener('keydown', e => {
+    if(e.key === 'Enter' && (e.metaKey || e.ctrlKey)) submitJournal();
+  });
+  document.getElementById('habitInput').addEventListener('keydown', e => {
+    if(e.key === 'Enter') submitHabit();
+  });
+});
+
+async function api(path, opts={}){
+  const res = await fetch(API + path, {
+    headers: {'Content-Type':'application/json'},
+    ...opts
+  });
+  if(!res.ok){ throw new Error(await res.text()); }
+  return res.json();
+}
+
+async function refreshAll(){
+  await Promise.all([loadDashboard(), loadJournal(), loadHabits(), loadWeekly()]);
+}
+
+async function loadDashboard(){
+  const d = await api(`/dashboard?username=${encodeURIComponent(username)}`);
+  document.getElementById('streakVal').textContent = d.streak_days + (d.streak_days === 1 ? ' day' : ' days');
+  document.getElementById('journalCountVal').textContent = d.journal_count;
+  document.getElementById('todayMoodVal').textContent = d.today_mood_label ? d.today_mood_label : 'not logged';
+  document.getElementById('adviceText').textContent = d.ai_advice;
+  setGauge(d.growth_score);
+}
+
+function setGauge(score){
+  document.getElementById('growthScoreVal').textContent = score;
+  const circumference = 282.7;
+  const offset = circumference - (score/100)*circumference;
+  const arc = document.getElementById('gaugeArc');
+  arc.style.transition = 'stroke-dashoffset 0.6s ease';
+  arc.setAttribute('stroke-dashoffset', offset);
+  const color = score >= 70 ? '#7cffb2' : score >= 40 ? '#ffb454' : '#ff8a7a';
+  arc.setAttribute('stroke', color);
+}
+
+async function loadJournal(){
+  const entries = await api(`/journal?username=${encodeURIComponent(username)}`);
+  const list = document.getElementById('entryList');
+  if(entries.length === 0){
+    list.innerHTML = '<div class="empty">No entries yet — write your first one above.</div>';
+    return;
+  }
+  list.innerHTML = entries.map(e => {
+    const d = new Date(e.created_at);
+    const reflection = e.ai_reflection
+      ? `<div style="margin-top:6px; padding-top:6px; border-top:1px dashed var(--line); color:var(--accent); font-size:12px; font-style:italic;">${escapeHtml(e.ai_reflection)}</div>`
+      : '';
+    return `<div class="entry">
+      <div class="meta">
+        <span class="date">${d.toLocaleDateString(undefined,{month:'short',day:'numeric'})} · ${d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'})}</span>
+        <span class="mood-pill mood-${e.mood_label}">${e.mood_label}</span>
+      </div>
+      <div>${escapeHtml(e.text)}</div>
+      ${reflection}
+    </div>`;
+  }).join('');
+}
+
+async function submitJournal(){
+  const input = document.getElementById('journalInput');
+  const text = input.value.trim();
+  if(!text) return;
+  await api('/journal', {method:'POST', body: JSON.stringify({username, text})});
+  input.value = '';
+  refreshAll();
+}
+
+async function loadHabits(){
+  const habits = await api(`/habits?username=${encodeURIComponent(username)}`);
+  const list = document.getElementById('habitList');
+  if(habits.length === 0){
+    list.innerHTML = '<div class="empty">No habits yet — add one to start tracking.</div>';
+    return;
+  }
+  list.innerHTML = habits.map(h => `
+    <div class="habit-row">
+      <div class="check ${h.done_today ? 'done' : ''}" onclick="toggleHabit(${h.id})"></div>
+      <div class="habit-name">${escapeHtml(h.name)}</div>
+      <div class="habit-streak">${h.current_streak > 0 ? '🔥 ' + h.current_streak : ''} ${h.completions_last_7_days}/7</div>
+    </div>
+  `).join('');
+}
+
+async function submitHabit(){
+  const input = document.getElementById('habitInput');
+  const name = input.value.trim();
+  if(!name) return;
+  await api('/habit', {method:'POST', body: JSON.stringify({username, name})});
+  input.value = '';
+  refreshAll();
+}
+
+async function toggleHabit(id){
+  await api(`/habit/${id}/checkin`, {method:'POST', body: JSON.stringify({username})});
+  refreshAll();
+}
+
+async function getAffirmation(){
+  const el = document.getElementById('affirmationText');
+  el.textContent = 'Thinking…';
+  try{
+    const r = await api('/affirmation', {method:'POST', body: JSON.stringify({username})});
+    el.textContent = r.text;
+  }catch(e){
+    el.textContent = 'Could not generate an affirmation right now — try again in a moment.';
+  }
+}
+
+async function loadWeekly(){
+  let url = `/insights/weekly?username=${encodeURIComponent(username)}`;
+  if(userCoords){ url += `&lat=${userCoords.lat}&lon=${userCoords.lon}`; }
+  const w = await api(url);
+  const el = document.getElementById('weeklyInsight');
+
+  document.getElementById('downloadCardBtn').href = `/insights/weekly/card?username=${encodeURIComponent(username)}`;
+  document.getElementById('downloadPdfBtn').href = `/reports/weekly.pdf?username=${encodeURIComponent(username)}`;
+
+  if(w.journal_entries_this_week === 0){
+    el.innerHTML = '<div class="empty">Not enough data yet — check back after a few entries.</div>';
+    return;
+  }
+  const trendClass = w.mood_trend === 'improving' ? 'trend-up' : w.mood_trend === 'declining' ? 'trend-down' : 'trend-flat';
+  const weatherRow = w.weather_temp_c != null
+    ? `<div class="row"><span class="k">Weather</span><span class="v">${Math.round(w.weather_temp_c)}°C, ${w.weather_condition}</span></div>`
+    : '';
+  el.innerHTML = `
+    <div class="row"><span class="k">Avg mood score</span><span class="v">${w.avg_mood_score}</span></div>
+    <div class="row"><span class="k">Mood trend</span><span class="v ${trendClass}">${w.mood_trend}</span></div>
+    <div class="row"><span class="k">Habit completion</span><span class="v">${w.habit_completion_rate}%</span></div>
+    <div class="row"><span class="k">Best day</span><span class="v">${w.most_positive_day || '—'}</span></div>
+    <div class="row"><span class="k">Entries this week</span><span class="v">${w.journal_entries_this_week}</span></div>
+    ${weatherRow}
+  `;
+}
+
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+</script>
+</body>
+</html>
