@@ -29,7 +29,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")
+STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
 
 
 # ---------- helpers ----------
